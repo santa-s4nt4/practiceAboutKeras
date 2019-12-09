@@ -1,3 +1,7 @@
+from keras import models
+from keras import layers
+from keras import optimizers
+from keras.preprocessing.image import ImageDataGenerator
 import os
 import shutil
 
@@ -89,3 +93,48 @@ print('total validation cat images:', len(os.listdir(validation_cats_dir)))
 print('total validation dog images:', len(os.listdir(validation_dogs_dir)))
 print('total test cat imgaes:', len(os.listdir(test_cats_dir)))
 print('total test dog images:', len(os.listdir(test_dogs_dir)))
+
+
+# 犬と猫を分類するための小さなCNNをインスタンス化
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu',
+                        input_shape=(150, 150, 3)))
+
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Flatten())
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+
+print(model.summary())
+
+# モデルのコンパイル
+model.compile(loss='binary_crossentropy',
+              optimizer=optimizers.RMSprop(lr=1e-4),
+              metrics=['acc'])
+
+# すべての画像を1/255ですけ―リウング
+train_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+train_generator = train_datagen.flow_from_directory(
+    train_dir,  # ターゲットディレクトリ
+    target_size=(150, 150),  # すべての画像のサイズを150x150に
+    batch_size=20,  # バッチサイズ
+    class_mode='binary')  # binary_crossentropyを使用するため二値のラベルが必要
+
+validation_generator = test_datagen.flow_from_directory(
+    validation_dir,
+    target_size=(150, 150),
+    batch_size=20,
+    class_mode='binary')
+
+for data_batch, labels_batch in train_generator:
+    print('data batch shape:', data_batch.shape)
+    print('labels batch shape:', labels_batch.shape)
+    break
