@@ -267,7 +267,7 @@ history = model.fit_generator(train_generator,
                               validation_steps=50)
 
 # モデルを保存
-model.save('cats_and_dogs_small_1.h5')
+model.save('cats_and_dogs_small_2.h5')
 
 # 訓練時の損失値と成果率をプロット
 acc = history.history['acc']

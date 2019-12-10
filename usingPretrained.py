@@ -147,6 +147,8 @@ history = model.fit_generator(train_generator,
                               validation_steps=50,
                               verbose=2)
 
+model.save('cats_and_dogs_small_3.h5')
+
 '''
 # 結果をプロット
 acc = history.history['acc']
